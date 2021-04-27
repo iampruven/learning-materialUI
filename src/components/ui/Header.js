@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import logo from "../../assets/logo.svg";
 import { Link } from "react-router-dom";
+
 import {
   AppBar,
   Button,
+  Menu,
+  MenuItem,
   Tabs,
   Tab,
   Toolbar,
@@ -32,9 +35,9 @@ const useStyles = makeStyles((theme) => ({
   },
   logoContainer: {
     padding: 0,
-    "&:hover":{
-      backgroundColor:"transparent"
-    }
+    "&:hover": {
+      backgroundColor: "transparent",
+    },
   },
   tabContainer: {
     marginLeft: "auto",
@@ -56,11 +59,20 @@ const useStyles = makeStyles((theme) => ({
 export default function Header(props) {
   const classes = useStyles();
   const [value, setValue] = useState(0);
-
+  const [anchorEl, setAnchorEl] = useState(null); //contains services tab
+  const [open, setOpen] = useState(false); //menu opened or not
   const handleChange = (e, value) => {
     setValue(value);
   };
-
+  const handleClick = (e) => {
+    //where we clicked on screen
+    setAnchorEl(e.currentTarget); //element that has just been clicked on
+    setOpen(true);
+  };
+  const handleClose = (e) => {
+    setAnchorEl(null);
+    setOpen(false);
+  };
   useEffect(() => {
     if (window.location.pathname === "/" && value !== 0) {
       setValue(0);
@@ -107,6 +119,9 @@ export default function Header(props) {
                 to="/"
               />
               <Tab
+                aria-owns={anchorEl ? "simple-menu" : undefined}
+                aria-haspopup={anchorEl ? true : undefined}
+                onMouseOver={(event) => handleClick(event)}
                 className={classes.tab}
                 label="Services"
                 component={Link}
@@ -138,6 +153,22 @@ export default function Header(props) {
             >
               Free Estimate
             </Button>
+            <Menu
+              id="simple-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{ onMouseLeave: handleClose }}
+            >
+               <MenuItem onClick={()=>{handleClose(); setValue(1)}} component={Link} to="/services">
+                Services
+              </MenuItem>
+              <MenuItem onClick={()=>{handleClose(); setValue(1)}} component={Link} to="/customsoftware">
+                Custom Software Development
+              </MenuItem>
+              <MenuItem component={Link} to="/mobileapp" onClick={()=>{handleClose(); setValue(1)}}>Mobile App Development</MenuItem>
+              <MenuItem component={Link} to="/websites" onClick={()=>{handleClose(); setValue(1)}}>Website Development</MenuItem>
+            </Menu>
           </Toolbar>
         </AppBar>
       </ElevationScroll>
